@@ -1,0 +1,48 @@
+name: Vendor FFmpeg wasm runtime
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/vendor-ffmpeg.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  vendor:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download pinned ffmpeg.wasm runtime files
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p vendor/ffmpeg
+          curl -L --fail --retry 3 -o vendor/ffmpeg/ffmpeg.js \
+            https://unpkg.com/@ffmpeg/ffmpeg@0.12.15/dist/umd/ffmpeg.js
+          curl -L --fail --retry 3 -o vendor/ffmpeg/814.ffmpeg.js \
+            https://unpkg.com/@ffmpeg/ffmpeg@0.12.15/dist/umd/814.ffmpeg.js
+          curl -L --fail --retry 3 -o vendor/ffmpeg/ffmpeg-core.js \
+            https://unpkg.com/@ffmpeg/core@0.12.10/dist/umd/ffmpeg-core.js
+          curl -L --fail --retry 3 -o vendor/ffmpeg/ffmpeg-core.wasm \
+            https://unpkg.com/@ffmpeg/core@0.12.10/dist/umd/ffmpeg-core.wasm
+          printf 'ffmpeg wrapper: 0.12.15\nffmpeg core: 0.12.10\n' > vendor/ffmpeg/VERSIONS.txt
+
+      - name: Commit runtime files into Slot-5
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add vendor/ffmpeg
+          if git diff --cached --quiet; then
+            echo 'Runtime files already current.'
+            exit 0
+          fi
+          git commit -m 'Vendor ffmpeg.wasm runtime files'
+          git push
