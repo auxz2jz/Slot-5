@@ -1,7 +1,7 @@
 (()=>{'use strict';
 const MAIN_VERSION='0.12.15',CORE_VERSION='0.12.10';
-const MAIN_BASE=`https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@${MAIN_VERSION}/dist/umd`;
-const CORE_BASE=`https://cdn.jsdelivr.net/npm/@ffmpeg/core@${CORE_VERSION}/dist/umd`;
+const MAIN_BASE='./vendor/ffmpeg';
+const CORE_BASE='./vendor/ffmpeg';
 const $=id=>document.getElementById(id);
 const e={loadBtn:$('loadBtn'),fileInput:$('fileInput'),dropZone:$('dropZone'),fileInfo:$('fileInfo'),fileName:$('fileName'),fileSize:$('fileSize'),fileType:$('fileType'),format:$('format'),quality:$('quality'),resolution:$('resolution'),audioRate:$('audioRate'),trimStart:$('trimStart'),trimEnd:$('trimEnd'),mute:$('mute'),fastMode:$('fastMode'),extraArgs:$('extraArgs'),convertBtn:$('convertBtn'),cancelBtn:$('cancelBtn'),progressBar:$('progressBar'),progressLabel:$('progressLabel'),progressPct:$('progressPct'),resultBox:$('resultBox'),resultMeta:$('resultMeta'),downloadBtn:$('downloadBtn'),videoPreview:$('videoPreview'),audioPreview:$('audioPreview'),imagePreview:$('imagePreview'),log:$('log'),clearLog:$('clearLog'),statusDot:$('statusDot'),statusText:$('statusText'),localWarning:$('localWarning')};
 let ffmpeg=null,file=null,loaded=false,busy=false,outURL=null,outBlob=null,outName='',blobURLs=[];
