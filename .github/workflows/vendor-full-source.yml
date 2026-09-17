@@ -1,0 +1,68 @@
+name: Vendor complete FFmpeg source snapshots
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/vendor-full-source.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  vendor-source:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Slot-5
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download FFmpeg and ffmpeg.wasm source trees
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf _source/FFmpeg _source/ffmpeg.wasm /tmp/FFmpeg /tmp/ffmpeg-wasm
+          mkdir -p _source
+
+          git clone --depth 1 --branch master https://github.com/FFmpeg/FFmpeg.git /tmp/FFmpeg
+          FFMPEG_SHA="$(git -C /tmp/FFmpeg rev-parse HEAD)"
+
+          git clone --depth 1 --branch main --recurse-submodules --shallow-submodules https://github.com/ffmpegwasm/ffmpeg.wasm.git /tmp/ffmpeg-wasm
+          WASM_SHA="$(git -C /tmp/ffmpeg-wasm rev-parse HEAD)"
+          TESTDATA_SHA="$(git -C /tmp/ffmpeg-wasm/testdata rev-parse HEAD)"
+
+          find /tmp/FFmpeg -name .git -prune -exec rm -rf {} +
+          find /tmp/ffmpeg-wasm -name .git -prune -exec rm -rf {} +
+
+          mv /tmp/FFmpeg _source/FFmpeg
+          mv /tmp/ffmpeg-wasm _source/ffmpeg.wasm
+
+          cat > _source/SOURCE_INFO.md <<EOF
+          # Vendored upstream source snapshots
+
+          These directories contain complete tracked working-tree snapshots, without nested Git history metadata.
+
+          - FFmpeg/FFmpeg (master): ${FFMPEG_SHA}
+          - ffmpegwasm/ffmpeg.wasm (main): ${WASM_SHA}
+          - ffmpegwasm/testdata submodule: ${TESTDATA_SHA}
+
+          Upstream repositories:
+          - https://github.com/FFmpeg/FFmpeg
+          - https://github.com/ffmpegwasm/ffmpeg.wasm
+          - https://github.com/ffmpegwasm/testdata
+          EOF
+
+      - name: Commit source snapshots into Slot-5
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add _source
+          if git diff --cached --quiet; then
+            echo 'Source snapshots are already current.'
+            exit 0
+          fi
+          git commit -m 'Vendor complete FFmpeg source snapshots'
+          git push
