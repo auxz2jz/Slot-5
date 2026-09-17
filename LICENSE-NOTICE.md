@@ -1,0 +1,1 @@
+OpenFFmpeg Web is an independent interface. FFmpeg and ffmpeg.wasm are separate open-source projects with their own licenses. Review their upstream license terms before redistribution.
