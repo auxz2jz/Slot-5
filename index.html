@@ -1,1 +1,65 @@
-placeholder
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>OpenFFmpeg Web</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="wrap">
+    <header class="top">
+      <div><h1>OpenFFmpeg Web</h1><p>Convert video and audio locally in your browser.</p></div>
+      <div class="status"><span id="statusDot"></span><span id="statusText">Engine not loaded</span></div>
+    </header>
+
+    <div id="localWarning" class="warning hidden">This app works best through GitHub Pages or another web server. Opening index.html directly with file:// may block the FFmpeg worker.</div>
+
+    <section class="grid">
+      <div class="card">
+        <h2>1. Load FFmpeg and choose a file</h2>
+        <button id="loadBtn" class="primary">Load FFmpeg Engine</button>
+        <label id="dropZone" class="drop">
+          <input id="fileInput" type="file" accept="video/*,audio/*,image/gif">
+          <strong>Choose a media file</strong>
+          <span>or drag and drop one here</span>
+        </label>
+        <div id="fileInfo" class="fileinfo hidden">
+          <div id="fileName" class="filename"></div>
+          <div><span id="fileSize"></span> · <span id="fileType"></span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>2. Output settings</h2>
+        <div class="formgrid">
+          <label>Format<select id="format"><option value="mp4">MP4</option><option value="mkv">MKV</option><option value="webm">WebM</option><option value="mov">MOV</option><option value="mp3">MP3</option><option value="wav">WAV</option><option value="flac">FLAC</option><option value="gif">GIF</option></select></label>
+          <label>Quality<select id="quality"><option value="high">High</option><option value="balanced" selected>Balanced</option><option value="small">Smaller file</option></select></label>
+          <label>Maximum height<select id="resolution"><option value="original">Original</option><option value="2160">2160p</option><option value="1440">1440p</option><option value="1080" selected>1080p</option><option value="720">720p</option><option value="480">480p</option></select></label>
+          <label>Audio bitrate<select id="audioRate"><option value="128">128 kbps</option><option value="192" selected>192 kbps</option><option value="256">256 kbps</option><option value="320">320 kbps</option></select></label>
+          <label>Trim start<input id="trimStart" placeholder="00:00:00"></label>
+          <label>Trim end<input id="trimEnd" placeholder="00:01:30"></label>
+        </div>
+        <div class="checks"><label><input id="mute" type="checkbox"> Remove audio</label><label><input id="fastMode" type="checkbox" checked> Faster encoding</label></div>
+        <details><summary>Advanced FFmpeg arguments</summary><input id="extraArgs" placeholder="Example: -r 30"></details>
+        <div class="actions"><button id="convertBtn" class="success" disabled>Convert File</button><button id="cancelBtn" class="danger" disabled>Cancel</button></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Progress</h2>
+      <div class="meter"><div id="progressBar"></div></div>
+      <div class="progressline"><span id="progressLabel">Waiting</span><span id="progressPct">0%</span></div>
+      <div id="resultBox" class="result hidden"><b>Conversion complete</b><div id="resultMeta"></div><button id="downloadBtn" class="success">Download Output</button><video id="videoPreview" class="preview hidden" controls></video><audio id="audioPreview" class="preview hidden" controls></audio><img id="imagePreview" class="preview hidden" alt="Converted preview"></div>
+    </section>
+
+    <section class="card">
+      <div class="loghead"><h2>Activity log</h2><button id="clearLog">Clear</button></div>
+      <pre id="log">Ready. Load the engine to begin.</pre>
+    </section>
+
+    <footer>FFmpeg and ffmpeg.wasm are separate open-source projects. This page fetches the browser runtime from public CDN-hosted package files; your media stays on your device.</footer>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
